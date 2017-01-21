@@ -14,6 +14,7 @@ Feature:
 - count asked words
 - count good/bad answers
 - multiple answer
+- can switch between language
 
 Known bugs:
 - after the last answer still count good bad answers
