@@ -2,7 +2,7 @@
 Ask (e.g.) English words from (e.g.) hungarian. Made in Qt
 
 The "word" .txt struct e.g.:
-word[tab]answer
+
 word, word, word[tab]answer, answer
 
 Feature:
