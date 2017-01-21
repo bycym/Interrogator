@@ -187,7 +187,7 @@ QStringList wordProcessor::getAnswer(int arrayIndex) const
             indexX = arrayIndex;
             indexY = 0;
         }
-        words << _words[indexX][indexY];
+        words = _words[indexX][indexY].split(",");
     }
     else
     {

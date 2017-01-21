@@ -5,6 +5,8 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QVector>
+#include <QMessageBox>
+#define __VERZ__ "0.01"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -14,6 +16,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     wp = new wordProcessor();
+
+    QString title("Interrogator - v" + QString(__VERZ__));
+    this->setWindowTitle(title);
+
     ui->wordListWidget->insertItem(0,wp->getNewWord());
     ui->goodLabel->setText(QString::number(wp->goodAnswer()));
     ui->badLabel->setText(QString::number(wp->badAnswer()));
@@ -174,5 +180,10 @@ void MainWindow::on_actionAsk_wrongs_answers_only_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-
+    QMessageBox mb(QMessageBox::Information,
+                   "About",
+                   "by Arcsibo\nhttps://github.com/arcsibo/Interrogator");
+    mb.setStandardButtons(QMessageBox::Ok);
+    mb.setIcon(QMessageBox::Information);
+    mb.exec();
 }
