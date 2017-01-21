@@ -1,0 +1,158 @@
+wether	ürü, akár
+ash	salak, hamu
+tread	cipőtalp, lépés
+to treat	kezel, bánik, valakivel
+trot	üget, ügetés, megfuttat
+asparagus	spárga
+appal	megdöbbent, meghökkent, megrémít
+applied	alkalmazott, felhasznált
+appeal	fellebezés, vozerő, varázs, csáb
+applaud	tapsol, 
+in spite of	vmi dacára, vmi ellenére
+detest	utál
+protest	tiltakozik
+insist	ragaszkodik
+insist of smt	ragaszkodik vmihez, kitart vki mellett
+receive	kap, átvesz, elfogad
+rely	megbízik, számít vkire
+counting	számláló, számítás
+law	törvény
+court	udvar, bíróság, keres vmit, udvarol valakinek
+judgement	ítélet, döntés, megítélés
+trial	próba, vizsgálat
+evidence	bizonyíték, kézzelfogható, tanubizonyság
+headlight	első lámpa
+spotlight	reflektorfény
+floodlight	díszkivilágítás
+flashlight	elemlámpa, zseblámpa
+kick in the pants	fenékbe rúgás, szidás
+lousy	tetves, vacak, pocsék
+had a women on the sly	titkolja, h van nője
+sly	ravasz, sunyi, alattomos
+ice	jegel, megöl
+insect	rovar
+to start out	elindul
+dripping	csepegő, zsír, szaft
+considering	figyelembe véve, tekintettel
+rude	goromba, nyers
+bush	bokor cserje
+high time	éppen ideje
+frie	süt (pl: szalonnát serpenyőben)
+cook	süt (pl: sütit)
+worried	zavarta
+instead of smt	valami helyett
+haven't enjoyed	nem szórakoztam
+put(ing) up	nem tolerál, kibír
+spring	könnyű ugrás (mint a macska)
+terement	bérház
+just keep on walking	csak sétálj egyenesen tovább
+bring	visz
+carpet	szőnyeg
+carpet-sweeper	seprű
+floor polisher	padló fényező
+goodness	jóság
+ground floor	földszint
+hoover	porszívó
+lavatory	illemhely, mosdókagyló
+spin dryer	centrifuga
+supper	vacsora
+opposite	ellentétes
+observed	megfigyelt
+desired	kívánatos
+relevant	idevonatkozó
+variety	fajta, különlegesség
+various	különböző
+charity	jótékonyságs
+charities	jótékonysági intézmény
+organics	szerves
+organized	szervezett
+organization	szervezett, egyesület
+couch potato	lusta
+claim	állít, követel, igényel
+descending	lemenő
+descendant	leszármazott, utód
+descend	esik, lejt, süllyed
+although	bár, habár, jóllehet
+though	mégis, noha, bár, ugyan
+despite	annak ellenére, dacára
+opposite	ellentétes, ellenkező, szemben
+scarcely	alig, aligha, bajosan
+board	felszáll, élelmez
+drove off	elrobog, elindul (kocsival)
+couch	autóbusz, hintó kocsi, vagon
+lay fektet, fekszik, alkalmaz, tesz, állít
+hardly likely	aligha, alig valószíűen
+lying	hazug
+used to	használt
+usage	szoká, gyakorolt, használt
+through out	keresztül kasul, mindenhol
+admiral	tengernagy
+admire	csodál, bámul
+admit	beval, elismer
+hairdo	frizura
+complaint	panasz, baj, besúgás
+complain	panaszkodik, bepanaszol
+lager	katonai tábor
+campaign	hadjárat, kampány
+tinker	barkácsol, bádogos, megfoltoz
+mop	felmos, felsúrol, grimasz
+jockey	lovas, lovász, lecsap
+saddle	nyereg, felnyergel
+vogue	divat
+vague /viúg/	bizonytalan, homályos
+inherited	örökölt
+enlarge	nagyít, kiterjeszt
+enormous	hatalmas, óriási
+amount	összeg, mennyiség
+enrichement	dúsítás, gazdagodás
+valuables	értéktárgy
+valuation	becslés, értékelés
+arranging /arindzsing/	elrendezés
+arrange	szervez, elintéz, elrendez
+avoid	elkerül
+furious	tomboló, örjöngő
+auxions	aggodó, nyugtalan
+permit	engedélyez, elfogad
+brief	rövid, tömör
+interruption	félbeszakítás
+lecture	előad, előadás
+diaper	pelenka
+dialect	nyelvjárás
+diary	napló, naptár
+barley	árpa
+brave	bátor
+courage	bátorság, merészség
+dive	lebukik, lemerül, zuhan
+nephew	unokaöcss
+pond	tacska, pocsolya
+fond	gyengéd, szerető, engedékeny
+count 	bíróság
+outh	eskü, fogadás
+honor, honour	becsület, kitüntet
+salary	fizetés, bér
+charge	vád, díj, költség, felszólít
+wonder	csodál, csoda, ámul
+antonym	anatómíi, ellentét
+opposite	ellentétes, túlsó, szembenlévő
+headword	címszóra
+pronunciation	kiejtés, hangsúly
+stressed	kiemelt
+syllable	szótag
+dayoff	szabadnap
+punctual	pontos
+visit	meglátogatni
+come here at once	gyere ide rögtön
+onto	-ra, -re
+envelope	boríték, bevonat
+furniture	bútor
+inspector	ellenőr, felügyelő
+polish 	kifényesít, políroz, csiszol
+quarrel	veszekedés, vita
+sweeper 	söpör
+tidy	takarít, csinos, rendez
+immediate	sürgős, azonnali
+relative	rokon
+aunt 	nagynéni
+cousin	unokatestvér
+appearance	kinézet, látszat
+vocabulary	szókincs, szótár

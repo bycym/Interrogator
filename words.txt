@@ -1,0 +1,229 @@
+it is common knowledge	köztudott
+fast	böjt
+mental performance	szellemi teljesítmény
+nutrient	tápanyag
+to overeat	túleszi magát
+grain	gabona
+to release energy	energiát kibocsájt
+to differ	különbözik
+to maintain	fentart
+to postpone	elhalaszt
+symptone	tünet
+hunger	éhség
+to overwhelm	eláraszt, elborít
+to grab	megragadni
+cereal bar	müzliszelet
+leisurely	kényelmes
+portable	hordozható
+dried fruit	aszalt gyümölcs
+prevalent	uralkodó
+to wonder	csodálkozik
+necessary	szükséges
+avoiding	elkerül
+dietary	diétás
+to decide	határoz
+concern of something	aggódik valami miatt
+preteens	kamasz
+often	gyakran
+independence	függetlenség
+statement	nyilatkozat
+decision	döntés
+among	között
+dietary expert	diéta szakértő
+adolescents	serdülő
+considering	figyelembe véve
+strict	szigorú
+though	bár, noha
+certain	bizonyos
+protein	fehérje
+whole grains	teljes kiörlésű
+veggies	zöldségek
+fibre	rost
+cardiovascular	szív- és érrendszeri
+blood cholesterol	vér koleszterin
+to maintaining	fenntart
+adequate	megfelelő
+dairy product	tejtermék
+depend on	függ valamitől
+restrictive	korlátozó
+fail to do	elmulasztják
+burger joint	hamgurgeres
+cosy restaurant	meghitt étterem, kicsi étterem
+trendy eatery	felkapott étkezde
+a stylish midtown brasserie	elegáns belvárosi söröző
+bistro	kis étterem
+a take-away	elvitel, csak elvitel van
+bagel shop	pékség
+a charming bakery, homey bakery	házias pékség
+a low-key hangout	visszafogott hely, visszafogott kikapcsolódási hely
+a dim sum	kínai étkezde
+hangout	lógni, zsivány tanya, búvóhely
+all you can eat deal, all you can eat buffet	svédasztal
+bottomless salad bowls	feneketlen salátás tálak
+multi-course feast	többfogásos lakoma
+authentic persian/itelan/greek cuisine	valódi xxx konyha
+a serious sunday brunch	komoly vasárnapi lakoma, komoly vasárnapi tízórai
+a superior	kiváló, színvonalas
+an incentive menu	ötlet gazdag menü
+an enormous array of smth	széles választéka valaminek
+fried appetizers	sült étvágygerjesztő
+entrees	előétel
+family faves	családi kedvezmény
+casual	átlagos
+fine dining	jó étkezés, komplett menüsor
+gracious hospitality, warm hospitality	szívélyes fogadtatás, meleg fogadtatás 
+dining in style	elegáns környzetben vacsora
+wise	bölcs
+reservation needed	foglalás szükséges
+superb service	kiváló szolgáltatás
+alfresco lunch	kiülős ebéd
+special ocession favourite	kiülős alkalmak
+upscale	előkelő
+delivery order for offices	kiszállítanak
+the place where everybody know your name	ahol törzs vendég...
+petty person	szűkmarkú
+oven-baked	kemencés
+smoked	füstölt
+ewe cheese	juhsajt
+chives	snidling
+handcrafted	kézműves
+to employ	munkát ad
+employee	munkavállaló
+employer	munkaadó
+emplment	foglalkoztató
+unemployment	munkanélküliség
+unemployed	munkanélküli
+agency	ügynökség
+apply for a job	pályázik állásra
+application	pályázat
+curriculum vitae	önéletrajz
+to requirement	követelmény
+to meet the requirement	megfelel a követelményeknek
+candicate	jelölt
+vacant	üres, szabad
+vacancy	üresedés
+sign the contract	aláír egy szerződést
+enclose	mellékel
+necessery evil	szükséges rossz
+research	kutatás
+i feel miserable	pocsékul érzem magam
+to dismiss an idea	elvetni egy ötletet
+to achive	elérni valamit
+achivement	teljesítmény
+unachivement	elérhetetlen
+deserve	megérdemli
+What do you do for a living?	Mi a munkád?
+entrepreneur	vállalkozó
+it's basic common sense	alapvető dolog
+properly	megfelelően
+talent	tehetséges
+desire	vágy, óhaj
+you take control of your future	vedd kezedbe a jövődet
+unique	egyedi
+vocation	szakma
+to conserve	megőriz
+process	folyamat
+to cut down a tree	kivág egy fát
+abbreviation	rövidítés
+remains	maradvány
+e.g., for example	például
+to prevent	megakadályoz
+species	faj
+construction equipment	munkagép
+jackhammer	légkalapács
+to measure	mérni
+chemical substance	vegyianyag
+to release	kibocsájt
+to pollute	szennyez
+pollutant	szennyező anyag
+volcanic eruption	vulkánokitörés
+it is extinct	kihalt
+famine	éhinség
+to starve	éhezni
+starvation	éhezés
+plants and wildlife, flora and fauna	növény- és állatvilág
+fossul fuels	fosszilis tüzelőanyag
+CFC	hajtógáz
+conservationists	természetvédő
+deforestation	erőírtás
+coal	szén
+endangered species	veszélyeztetett fajok
+to ceased	megszűnik
+to exist	létezik
+to evolve	kifejlődik
+predatory instinct	ragadozó ösztön
+ruthless	könyörtelen
+natural	resources	természetes erőforrások
+to threaten	fenyeget
+tirelessly	fáradhatatlanul
+to raise awareness	növeli a tudatosságot
+high profile	elismert
+issue	ügy, próba
+ultimate	végső
+goal	cél
+degradation	pusztulás
+horn	szarv, tülök
+prize	díj
+highly prize	nagyra értékelt
+relentlessly	szakadatlanul
+natural habitat	természetes élőhely
+widespread	széles körben elterjedt, elterjedt
+constant	állandó
+threat	fenyegetés
+poacher	orvvadász
+certain	biztos, bizonyos
+far from certain	bizonytalan
+to isolate	elszigetel
+expansion	terjeszkedés
+to punish	büntetni
+punishable	büntethető
+it fetches high prices	jó pénzt hoz
+determined	eltökélt
+existence	létezés
+scientific	tudományos
+purpose	cél
+sanctuary	menedék
+supply	készlet
+to dwindle	megcsappan, csökken
+collision	ütközés
+to become entangled	belegabalyodik valamibe
+to disappear	eltűnik
+organ	szerv
+to seek, sought	keresni
+to trade	kereskedni
+to care	gondoskodik
+to appreciate	érzékelni
+affection	ragaszkodás, szeretet
+to enhance	elősegít
+principle	elv
+to cherish	elősegít
+i feel cherished and loved	érzem hogy szeretnek
+to struggle with	odabújik valakihez
+handclasp	kézfogás
+to emerge	kialakul
+to share	megosztani
+experience	élmény
+event	esemény
+joy	öröm
+defeat	vereség, kudarc
+household chores	házimunka
+a great deal of	sok, nagy mennyiségű
+guidance	irányítás
+encouragement	bátorítás, támogatás
+to promote	támogat
+self-esteem	önbecsülés
+privacy	magánélet
+extracurricular activity	tanórán kívüli tevékenység
+rough	durva, érdes
+it comes in handy	jól jön
+concern	aggodalom
+to respond to	reagál valamire
+flexible	rugalmas
+felxibility	rugalmasság
+challange	kihívás
+to switch jobs	állást változtat
+to retire	nyugdíjba megy
+responsibility	felelősség
+to strengthen	erősít
+decition-making	döntéshozás
+to participate in	részt vesz valamiben
