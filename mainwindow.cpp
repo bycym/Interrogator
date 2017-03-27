@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QVector>
 #include <QMessageBox>
+#include "achivementdialog.h"
 #define __VERZ__ "0.01"
 
 
@@ -17,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     wp = new wordProcessor();
 
-    QString title("Interrogator - v" + QString(__VERZ__));
+    QString title("Interrogator - v" + QString(__VERZ__) + " - " + _fileName);
     this->setWindowTitle(title);
 
     ui->wordListWidget->insertItem(0,wp->getNewWord());
@@ -132,6 +133,10 @@ void MainWindow::on_actionOpen_file_2_triggered()
         ui->possibleAnswerListWidget->clear();
 
         _askedIndex.push_back(wp->getAskedIndex());
+
+        QStringList tmp = _fileName.split( "/" );
+        QString openedFileName = tmp.value( tmp.length()-1);
+        this->setWindowTitle("Interrogator - v" + QString(__VERZ__) + " - " + openedFileName);
     }
 }
 
@@ -176,6 +181,7 @@ void MainWindow::on_actionAsk_wrongs_answers_only_triggered()
     {
         newWords();
     }
+    this->statusBar()->showMessage("there is " + QString(wp->getWrongWordsSize()) + " wrong word(s).");
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -186,4 +192,77 @@ void MainWindow::on_actionAbout_triggered()
     mb.setStandardButtons(QMessageBox::Ok);
     mb.setIcon(QMessageBox::Information);
     mb.exec();
+}
+
+void MainWindow::on_actionExport_wrong_answers_triggered()
+{
+    QString path = QDir::homePath();
+    bool ret = false;
+
+    if(_fileName != ""){
+        QFileInfo info(_fileName);
+        path = info.absolutePath();
+    }
+
+    QString fn = QFileDialog::getSaveFileName(
+            this,
+            "Save file...",
+            path,
+            "Szövegfájlok(*.txt);;Minden fájl(*)"
+            );
+    QStringList thingsToDo;
+    qDebug() << fn;
+    if(!fn.isEmpty())
+    {
+        ret = wp->saveFile(fn,false);
+
+    }
+    qDebug() << "ret: " << ret;
+
+}
+
+void MainWindow::on_actionExport_wrong_answers_append_triggered()
+{
+    QString path = QDir::homePath();
+    bool ret = false;
+
+    if(_fileName != ""){
+        QFileInfo info(_fileName);
+        path = info.absolutePath();
+    }
+
+    QString fn = QFileDialog::getSaveFileName(
+            this,
+            "Save file...",
+            path,
+            "Szövegfájlok(*.txt);;Minden fájl(*)"
+            );
+    QStringList thingsToDo;
+    qDebug() << fn;
+    if(!fn.isEmpty())
+    {
+        ret = wp->saveFile(fn,true);
+
+    }
+    qDebug() << "ret: " << ret;
+}
+
+void MainWindow::on_actionAk_wrong_answers_only_append_triggered()
+{
+    bool ret = false;
+    this->statusBar()->showMessage("there is " + QString(wp->getWrongWordsSize()) + " wrong word(s).");
+    ret = wp->getWrongAnswersOnly(true);
+    if(ret)
+    {
+        // TODO! new name "push wrong answers"
+        // TODO! newWords has a init, modify it!
+        newWords();
+    }
+
+}
+
+void MainWindow::on_actionAchivements_triggered()
+{
+    AchivementDialog ad(this);
+    ad.exec();
 }

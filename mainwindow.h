@@ -36,6 +36,14 @@ private slots:
 
     void on_actionAbout_triggered();
 
+    void on_actionExport_wrong_answers_triggered();
+
+    void on_actionExport_wrong_answers_append_triggered();
+
+    void on_actionAk_wrong_answers_only_append_triggered();
+
+    void on_actionAchivements_triggered();
+
 private:
     Ui::MainWindow *ui;
     void addElementToList();//(QString word);

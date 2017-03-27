@@ -3,6 +3,9 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
+#include <set>
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
 
 wordProcessor::wordProcessor()
 {
@@ -152,6 +155,7 @@ void wordProcessor::init()
     _goodAnswer = 0;
     _allWords = _words.size();
     _askedIndex = 0;
+    std::srand(time(0));
     std::random_shuffle(_words.begin(),_words.end());
     _wrongWords.clear();
 }
@@ -245,12 +249,57 @@ bool wordProcessor::openFile(QString fileName)
     return ret;
 }
 
+bool wordProcessor::saveFile(QString fileName, bool append)
+{
+    bool ret = false;
+
+    QFile file(fileName);
+
+    if(append)
+    {
+        file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+    }
+    else
+    {
+        file.open(QIODevice::WriteOnly | QIODevice::Text);
+    }
+
+    if(!file.isOpen()){
+        qDebug() << "- Error, unable to open" << "outputFilename" << "for output";
+        return false;
+    }
+
+    //QDataStream outStream(&file);
+    QTextStream outStream(&file);
+    /*
+    for(QStringList sl : _wrongWords)
+    {
+        for(QString s : sl)
+        {
+            outStream << s;
+        }
+    }*/
+
+    for(int i = 0; i < _wrongWords.size(); ++i)
+    {
+        qDebug() << "export line: " << i;
+        outStream << _wrongWords[i][0];
+        outStream << _separate[TABULATOR];
+        outStream << _wrongWords[i][1];
+        outStream << "\n";
+    }
+
+    file.close();
+
+    return true;
+}
+
 bool wordProcessor::getSwitch()
 {
     return _switched;
 }
 
-bool wordProcessor::getWrongAnswersOnly()
+bool wordProcessor::getWrongAnswersOnly(bool append)
 {
     bool ret = false;
 
@@ -267,11 +316,22 @@ bool wordProcessor::getWrongAnswersOnly()
     else
     {
         ret = true;
-        _words.clear();
+        if(!append)
+        {
+            _words.clear();
+        }
         for(QStringList s : _wrongWords)
         {
             _words.push_back(s);
         }
+
+        /*std::set<QStringList> s( _words.begin(), _words.end() );
+        _words.assign( s.begin(), s.end() );*/
+/*
+        std::set<QStringList> s;
+        unsigned size = _words.size();
+        for( unsigned i = 0; i < size; ++i ) s.insert( _words[i] );
+        _words.assign( s.begin(), s.end() );*/
 
     }
     return ret;

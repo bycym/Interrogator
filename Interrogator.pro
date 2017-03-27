@@ -14,11 +14,19 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    wordprocessor.cpp
+    wordprocessor.cpp \
+    achivementdialog.cpp
 
 HEADERS  += mainwindow.h \
-    wordprocessor.h
+    wordprocessor.h \
+    achivementdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    achivementdialog.ui
 
 CONFIG += c++11
+
+DISTFILES += \
+    Images/100.png \
+    Images/500.png \
+    Images/1000.png

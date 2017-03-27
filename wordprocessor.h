@@ -28,6 +28,7 @@ public:
     QStringList getAnswer(int arrayIndex) const;
 
     bool openFile(QString fileName);
+    bool saveFile(QString fileName, bool append = false);
 
     /*!
      * \brief switchLanguage switch language
@@ -40,7 +41,12 @@ public:
      */
     bool getSwitch();
 
-    bool getWrongAnswersOnly();
+    bool getWrongAnswersOnly(bool append = false);
+
+    int getWrongWordsSize()
+    {
+        return _wrongWords.size();
+    }
 
 private:
     /***

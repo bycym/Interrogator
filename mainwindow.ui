@@ -195,18 +195,22 @@
     </property>
     <addaction name="separator"/>
     <addaction name="actionOpen_file_2"/>
+    <addaction name="actionExport_wrong_answers"/>
+    <addaction name="actionExport_wrong_answers_append"/>
    </widget>
    <widget class="QMenu" name="menuWords">
     <property name="title">
      <string>Words</string>
     </property>
     <addaction name="actionAsk_wrongs_answers_only"/>
+    <addaction name="actionAk_wrong_answers_only_append"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionAchivements"/>
    </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuWords"/>
@@ -234,6 +238,26 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionExport_wrong_answers">
+   <property name="text">
+    <string>Export wrong answers</string>
+   </property>
+  </action>
+  <action name="actionExport_wrong_answers_append">
+   <property name="text">
+    <string>Export wrong answers (append)</string>
+   </property>
+  </action>
+  <action name="actionAk_wrong_answers_only_append">
+   <property name="text">
+    <string>Ask wrong answers only (append)</string>
+   </property>
+  </action>
+  <action name="actionAchivements">
+   <property name="text">
+    <string>Achivements</string>
    </property>
   </action>
  </widget>
