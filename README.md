@@ -20,4 +20,6 @@ Known bugs:
 - after the last answer still count good bad answers
 - there is some spaces in the right answers list
 
+[Download](https://arcsibo.gumroad.com/l/ZvJvu)
+
 ![alt tag](https://github.com/arcsibo/Interrogator/blob/master/screenshot.png)
