@@ -1,0 +1,55 @@
+name: Test Installing Qt
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2019, macos-10.15]
+        # os: [ubuntu-20.04, ubuntu-18.04, windows-2019, macos-10.15]
+        version: ['5.9.0', '5.15.1', '6.2.0']
+
+        # Ubuntu 18 is not a supported target for Qt 6: https://www.qt.io/blog/qt6-development-hosts-and-targets
+        exclude:
+          - os: ubuntu-18.04
+            version: '6.2.0'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: ${{matrix.version}}
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_mingw73'
+          dir: '${{github.workspace}}/qt/'
+          install-deps: 'true'
+
+      - name: Configure test project on windows
+        if: startsWith(matrix.os, 'windows')
+        env:
+          QT_VERSION: ${{ matrix.version }}
+        run: |
+          cd tests/TestWithModules
+          call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          IF "%QT_VERSION:~0,1%"=="5" ( dir %Qt5_DIR%\lib\cmake ) ELSE ( dir %Qt6_DIR%\lib\cmake )
+          qmake
+        shell: cmd
+
+      - name: Configure test project on unix
+        if: (!startsWith(matrix.os, 'windows'))
+        env:
+          QT_VERSION: ${{ matrix.version }}
+        run: |
+          cd tests/TestWithModules
+          if [[ $QT_VERSION == 6* ]]; then
+            ls "$Qt6_DIR/lib/cmake"
+          else
+            ls "$Qt5_DIR/lib/cmake"
+          fi
+          qmake
+        shell: bash
+
