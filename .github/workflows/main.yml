@@ -11,8 +11,8 @@ on:
     
 env:
   BUILD_TYPE: Release
-  ACTIONS_RUNNER_DEBUG: true
-  ACTIONS_STEP_DEBUG: true
+#   ACTIONS_RUNNER_DEBUG: true
+#   ACTIONS_STEP_DEBUG: true
 
 
 jobs:
@@ -96,9 +96,9 @@ jobs:
           ACTIONS_STEP_DEBUG: true
         working-directory: ${{github.workspace}}
         run:  |
-              nmake clean
+              make clean
               qmake -config release
-              nmake
+              make
               dir '${{github.workspace}}\build'
               dir '${{github.workspace}}'
               dir '${{github.workspace}}\debug'
