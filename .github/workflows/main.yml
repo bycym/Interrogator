@@ -96,6 +96,8 @@ jobs:
               qmake CONFIG+=release -r '${{github.workspace}}\Interrogator.pro' 
               cmake -DCMAKE_BUILD_TYPE=Release
               make
+              dir '${{github.workspace}}\build'
+              dir '${{github.workspace}}'
               
       - name: Create build foder 
         if: (!startsWith(matrix.os, 'windows'))
