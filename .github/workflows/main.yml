@@ -98,7 +98,6 @@ jobs:
         run:  |
               make clean
               qmake -config release
-              make
               dir '${{github.workspace}}\build'
               dir '${{github.workspace}}'
               dir '${{github.workspace}}\debug'
@@ -149,7 +148,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: interrogator.tar
-          path: interrogator.tar
+          path: |
+            interrogator.tar
+            Makefile.Release
+            Makefile
             
 #       - uses: actions/upload-artifact@v3
 #         with:
