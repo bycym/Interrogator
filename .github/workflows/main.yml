@@ -1,7 +1,14 @@
 name: Test Installing Qt
 
-on: [push, pull_request]
+# on: [push, pull_request]
 
+on:
+  push:     
+    branches:
+      - main
+  pull_request: 
+    types: [opened, synchronize, reopened, closed]
+    
 env:
   BUILD_TYPE: Release
 
@@ -61,10 +68,16 @@ jobs:
         
         
       #- name: Configure CMake
-      #  run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'
-      - name: Configure CMake
-        run: cmake '${{github.workspace}}'
+#       #  run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'
+#       run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH="${{env.Qt5_Dir}}/lib/cmake/" -DQt5_DIR=${{env.Qt5_Dir}}/lib/cmake/Qt5/ -G "CodeBlocks - MinGW Makefiles" -B '${{github.workspace}}'/build
+#       - name: Configure CMake
+#         run: cmake '${{github.workspace}}'
 
+#       - name: Build
+#         run: cmake --build '${{github.workspace}}' --target RePr
+        
       - name: Build
-        run: cmake --build '${{github.workspace}}' --target RePr
+        working-directory: ${{github.workspace}}
+        run:  |
+              qmake -r '${{github.workspace}}\Interrogator.pro'
 
