@@ -80,7 +80,7 @@ jobs:
       
         
       - name: Build
-        working-directory: ${{github.workspace}}
+        working-directory: ${{github.workspace}}/build
         run:  |
               qmake CONFIG+=release -r '${{github.workspace}}\Interrogator.pro' 
               
@@ -91,7 +91,7 @@ jobs:
               
               
       - name: Tar files
-        run: tar -cvf interrogator.tar ${{github.workspace}}/debug
+        run: tar -cvf interrogator.tar ${{github.workspace}}/build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
