@@ -2,6 +2,10 @@ name: Test Installing Qt
 
 on: [push, pull_request]
 
+env:
+  BUILD_TYPE: Release
+
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -54,4 +58,11 @@ jobs:
           fi
           qmake
         shell: bash
+        
+        
+      - name: Configure CMake
+        run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'/build
+
+      - name: Build
+        run: cmake --build '${{github.workspace}}'/build --target RePr
 
