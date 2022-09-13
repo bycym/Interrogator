@@ -16,11 +16,12 @@ env:
 
 
 jobs:
-  ci:
+  macos:
     runs-on: ${{ matrix.os }}
-    strategy:
+    strategy: 
       matrix:
         # os: [windows-2019, macos-10.15]
+#         os: [windows, mac, linux]
         os: [windows, mac, linux]
         # os: [ubuntu-20.04, ubuntu-18.04, windows-2019, macos-10.15]
         # version: ['5.9.0', '5.15.1', '6.2.0']
@@ -79,9 +80,9 @@ jobs:
 #         run: cmake --build '${{github.workspace}}' --target RePr
 
       
-      - name: Create build foder 
-        if: startsWith(matrix.os, 'windows')
-        run: mkdir ${{github.workspace}}\build
+#       - name: Create build foder 
+#         if: startsWith(matrix.os, 'windows')
+#         run: mkdir ${{github.workspace}}\build
         
         
 #         cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -121,8 +122,9 @@ jobs:
         if: (!startsWith(matrix.os, 'windows'))
         run: mkdir ${{github.workspace}}/build
         
+        
       - name: Build
-        if: (!startsWith(matrix.os, 'windows'))
+        if: startsWith(matrix.os, 'linux')
         env:
           ACTIONS_RUNNER_DEBUG: true
           ACTIONS_STEP_DEBUG: true
@@ -130,7 +132,16 @@ jobs:
         run:  |
               qmake CONFIG+=release
               make
-              ls -R
+              
+      - name: Build
+        if: startsWith(matrix.os, 'mac')
+        env:
+          ACTIONS_RUNNER_DEBUG: true
+          ACTIONS_STEP_DEBUG: true
+        working-directory: ${{github.workspace}}
+        run:  |
+              qmake CONFIG+=release
+              make
 
               
 #       - uses: montudor/action-zip@v1
@@ -138,25 +149,34 @@ jobs:
 #           args: zip -qq -r interrogator.zip ${{github.workspace}}
               
               
-      - name: Tar files
-        if: startsWith(matrix.os, 'windows')
-        run: tar -cvf interrogator.tar ${{github.workspace}}\build
+#       - name: Tar files
+#         if: startsWith(matrix.os, 'windows')
+#         run: tar -cvf interrogator.tar ${{github.workspace}}\build
         
-      - name: Tar files
-        if: (!startsWith(matrix.os, 'windows'))
-        run: tar -cvf interrogator.tar ${{github.workspace}}/build
+#       - name: Tar files
+#         if: (!startsWith(matrix.os, 'windows'))
+#         run: tar -cvf interrogator.tar ${{github.workspace}}/build
 
-      - name: Upload Artifact
+      - name: Upload Artifact ${{github.os}}
+        if: startsWith(matrix.os, 'mac')
         uses: actions/upload-artifact@v3
         with:
-          name: interrogator.tar
+          name: Interrogator.app
           path: |
-            interrogator.tar
-            Makefile.Release
-            Makefile
+            Interrogator.app
             
-#       - uses: actions/upload-artifact@v3
-#         with:
-#           name: Interrogator
-#           path: ${{github.workspace}}
+      - name: Upload Artifact ${{github.os}}
+        if: startsWith(matrix.os, 'linux')
+        uses: actions/upload-artifact@v3
+        with:
+          name: Interrogator
+          path: |
+            Interrogator
 
+      - name: Upload Artifact ${{github.os}}
+        if: startsWith(matrix.os, 'windows')
+        uses: actions/upload-artifact@v3
+        with:
+          name: Interrogator.exe
+          path: |
+            Interrogator.exe
