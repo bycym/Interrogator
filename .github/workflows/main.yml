@@ -93,7 +93,8 @@ jobs:
           ACTIONS_STEP_DEBUG: true
         working-directory: ${{github.workspace}}\build
         run:  |
-              cmake -DCMAKE_BUILD_TYPE=Release ..
+              qmake CONFIG+=release -r '${{github.workspace}}\Interrogator.pro' 
+              cmake -DCMAKE_BUILD_TYPE=Release
               make
               
       - name: Create build foder 
