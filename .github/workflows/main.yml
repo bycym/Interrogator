@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         # os: [windows-2019, macos-10.15]
-        os: [windows-2019]
+        os: [macos-10.15]
         # os: [ubuntu-20.04, ubuntu-18.04, windows-2019, macos-10.15]
         # version: ['5.9.0', '5.15.1', '6.2.0']
         version: ['5.9.0']
@@ -126,10 +126,11 @@ jobs:
         env:
           ACTIONS_RUNNER_DEBUG: true
           ACTIONS_STEP_DEBUG: true
-        working-directory: ${{github.workspace}}/build
+        working-directory: ${{github.workspace}}
         run:  |
-              qmake CONFIG+=release -r '${{github.workspace}}\Interrogator.pro' 
-              make release
+              qmake CONFIG+=release
+              make
+              ls -R
 
               
 #       - uses: montudor/action-zip@v1
