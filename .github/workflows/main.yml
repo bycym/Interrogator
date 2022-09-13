@@ -62,6 +62,8 @@ jobs:
         
       #- name: Configure CMake
       #  run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'
+      - name: Configure CMake
+        run: cmake --configure '${{github.workspace}}'
 
       - name: Build
         run: cmake --build '${{github.workspace}}' --target RePr
