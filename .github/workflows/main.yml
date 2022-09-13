@@ -11,10 +11,11 @@ on:
     
 env:
   BUILD_TYPE: Release
+  ACTIONS_RUNNER_DEBUG: true
 
 
 jobs:
-  test:
+  ci:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -75,13 +76,31 @@ jobs:
 
 #       - name: Build
 #         run: cmake --build '${{github.workspace}}' --target RePr
+
+      
         
       - name: Build
         working-directory: ${{github.workspace}}
         run:  |
               qmake -r '${{github.workspace}}\Interrogator.pro'
-      - uses: actions/upload-artifact@v3
+              
+              
+      - uses: montudor/action-zip@v1
         with:
-          name: Interrogator
-          path: ${{github.workspace}}/release
+          args: zip -qq -r interrogator.zip ${{github.workspace}}
+              
+              
+#       - name: Tar files
+#         run: tar -cvf my_files.tar /path/to/my/directory
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: interrogator.zip
+          path: interrogator.zip
+            
+#       - uses: actions/upload-artifact@v3
+#         with:
+#           name: Interrogator
+#           path: ${{github.workspace}}
 
