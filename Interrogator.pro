@@ -25,6 +25,7 @@ FORMS    += mainwindow.ui \
     achivementdialog.ui
 
 CONFIG += c++11
+CONFIG += static
 
 DISTFILES += \
     Images/100.png \
