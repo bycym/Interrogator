@@ -79,10 +79,22 @@ jobs:
 
       
       - name: Create build foder 
+        if: startsWith(matrix.os, 'windows')
         run: mkdir ${{github.workspace}}\build
         
       - name: Build
+        if: startsWith(matrix.os, 'windows')
         working-directory: ${{github.workspace}}\build
+        run:  |
+              qmake CONFIG+=release -r '${{github.workspace}}\Interrogator.pro' 
+              
+      - name: Create build foder 
+        if: (!startsWith(matrix.os, 'windows'))
+        run: mkdir ${{github.workspace}}/build
+        
+      - name: Build
+        if: (!startsWith(matrix.os, 'windows'))
+        working-directory: ${{github.workspace}}/build
         run:  |
               qmake CONFIG+=release -r '${{github.workspace}}\Interrogator.pro' 
               
@@ -93,6 +105,11 @@ jobs:
               
               
       - name: Tar files
+        if: startsWith(matrix.os, 'windows')
+        run: tar -cvf interrogator.tar ${{github.workspace}}\build
+        
+      - name: Tar files
+        if: (!startsWith(matrix.os, 'windows'))
         run: tar -cvf interrogator.tar ${{github.workspace}}/build
 
       - name: Upload Artifact
