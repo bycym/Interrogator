@@ -82,7 +82,7 @@ jobs:
       - name: Build
         working-directory: ${{github.workspace}}
         run:  |
-              qmake -r '${{github.workspace}}\Interrogator.pro'
+              qmake CONFIG+=release -r '${{github.workspace}}\Interrogator.pro' 
               
               
 #       - uses: montudor/action-zip@v1
@@ -91,7 +91,7 @@ jobs:
               
               
       - name: Tar files
-        run: tar -cvf interrogator.zip ${{github.workspace}}
+        run: tar -cvf interrogator.tar ${{github.workspace}}/debug
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
