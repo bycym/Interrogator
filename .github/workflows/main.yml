@@ -80,4 +80,8 @@ jobs:
         working-directory: ${{github.workspace}}
         run:  |
               qmake -r '${{github.workspace}}\Interrogator.pro'
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Interrogator
+          path: ${{github.workspace}}
 
