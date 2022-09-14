@@ -16,7 +16,7 @@ env:
 
 
 jobs:
-  macos:
+  ci:
     runs-on: ${{ matrix.os }}
     strategy: 
       matrix:
