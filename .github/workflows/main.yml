@@ -78,19 +78,19 @@ jobs:
           qmake
         shell: cmd
 
-      - name: Configure test project on unix
-        if: (!startsWith(matrix.os, 'windows'))
-        env:
-          QT_VERSION: ${{ matrix.version }}
-        run: |
-          cd tests/TestWithModules
-          if [[ $QT_VERSION == 6* ]]; then
-            ls "$Qt6_DIR/lib/cmake"
-          else
-            ls "$Qt5_DIR/lib/cmake"
-          fi
-          qmake
-        shell: bash
+#       - name: Configure test project on unix
+#         if: (!startsWith(matrix.os, 'windows'))
+#         env:
+#           QT_VERSION: ${{ matrix.version }}
+#         run: |
+#           cd tests/TestWithModules
+#           if [[ $QT_VERSION == 6* ]]; then
+#             ls "$Qt6_DIR/lib/cmake"
+#           else
+#             ls "$Qt5_DIR/lib/cmake"
+#           fi
+#           qmake
+#         shell: bash
         
         
       #- name: Configure CMake
