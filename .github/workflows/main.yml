@@ -1,4 +1,4 @@
-name: Test Installing Qt
+name: CI for Interrogator
 
 # on: [push, pull_request]
 
