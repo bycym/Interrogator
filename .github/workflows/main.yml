@@ -78,41 +78,6 @@ jobs:
           qmake
         shell: cmd
 
-#       - name: Configure test project on unix
-#         if: (!startsWith(matrix.os, 'windows'))
-#         env:
-#           QT_VERSION: ${{ matrix.version }}
-#         run: |
-#           cd tests/TestWithModules
-#           if [[ $QT_VERSION == 6* ]]; then
-#             ls "$Qt6_DIR/lib/cmake"
-#           else
-#             ls "$Qt5_DIR/lib/cmake"
-#           fi
-#           qmake
-#         shell: bash
-        
-        
-      #- name: Configure CMake
-#       #  run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -B '${{github.workspace}}'
-#       run: cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH="${{env.Qt5_Dir}}/lib/cmake/" -DQt5_DIR=${{env.Qt5_Dir}}/lib/cmake/Qt5/ -G "CodeBlocks - MinGW Makefiles" -B '${{github.workspace}}'/build
-#       - name: Configure CMake
-#         run: cmake '${{github.workspace}}'
-
-#       - name: Build
-#         run: cmake --build '${{github.workspace}}' --target RePr
-
-      
-#       - name: Create build foder 
-#         if: startsWith(matrix.os, 'windows')
-#         run: mkdir ${{github.workspace}}\build
-        
-        
-#         cmake -DCMAKE_BUILD_TYPE=Release ..
-#qmake CONFIG+=release -r '${{github.workspace}}\Interrogator.pro' 
- #             cmake -DCMAKE_BUILD_TYPE=Release
-  #            make
-              
       - name: Build
         if: startsWith(matrix.os, 'windows')
         env:
@@ -121,22 +86,17 @@ jobs:
         working-directory: ${{github.workspace}}
         run:  |
               qmake CONFIG+=release
-              make release
+              mingw32-make -f Makefile.Release all -platform win32-g++
               dir '${{github.workspace}}'
-              
-#       - name: Build
-#         if: startsWith(matrix.os, 'windows')
-#         env:
-#           ACTIONS_RUNNER_DEBUG: true
-#           ACTIONS_STEP_DEBUG: true
-#         working-directory: ${{github.workspace}}\build
-#         run:  |
-#               qmake CONFIG+=release -r '${{github.workspace}}\Interrogator.pro' 
-#               cmake -DCMAKE_BUILD_TYPE=Release
-#               make
-#               dir '${{github.workspace}}\build'
-#               dir '${{github.workspace}}'
-              
+
+      - name: Upload Artifact
+        if: startsWith(matrix.os, 'windows')
+        uses: actions/upload-artifact@v3
+        with:
+          name: Interrogator.exe
+          path: |
+            Interrogator.exe
+    
       - name: Create build foder 
         if: (!startsWith(matrix.os, 'windows'))
         run: mkdir ${{github.workspace}}/build
@@ -153,6 +113,14 @@ jobs:
               make
               ls -R
               
+      - name: Upload Artifact
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: actions/upload-artifact@v3
+        with:
+          name: Interrogator
+          path: |
+            Interrogator
+              
       - name: Build
         if: startsWith(matrix.os, 'mac')
         env:
@@ -163,18 +131,8 @@ jobs:
               qmake CONFIG+=release
               make
 
-              
-#       - uses: montudor/action-zip@v1
-#         with:
-#           args: zip -qq -r interrogator.zip ${{github.workspace}}
-              
-              
-#       - name: Tar files
-#         if: startsWith(matrix.os, 'windows')
-#         run: tar -cvf interrogator.tar ${{github.workspace}}\build
-        
       - name: Tar files
-        if: startsWith(matrix.os, 'windows')
+        if: startsWith(matrix.os, 'mac')
         run: tar -cvf interrogator.tar Interrogator.app
 
       - name: Upload Artifact ${{github.os}}
@@ -185,19 +143,5 @@ jobs:
           path: |
             interrogator.tar 
             
-      - name: Upload Artifact ${{github.os}}
-        if: startsWith(matrix.os, 'ubuntu')
-        uses: actions/upload-artifact@v3
-        with:
-          name: Interrogator
-          path: |
-            Interrogator
 
-      - name: Upload Artifact ${{github.os}}
-        if: startsWith(matrix.os, 'windows')
-        uses: actions/upload-artifact@v3
-        with:
-          name: Interrogator.exe
-          path: |
-            Interrogator.exe
 
