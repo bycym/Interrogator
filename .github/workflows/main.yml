@@ -22,7 +22,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy: 
       matrix:
-        os: [macos-10.15, ubuntu-20.04, windows-2019]
+        os: [macos-latest, ubuntu-20.04, windows-latest]
         # os: [ubuntu-20.04, ubuntu-18.04, windows-2019, macos-10.15]
         # version: ['5.9.0', '5.15.1', '6.2.0']
         version: ['5.9.0']
@@ -93,7 +93,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         uses: actions/upload-artifact@v3
         with:
-          name: Interrogator.exe
+          name: Interrogator ${{github.os}}
           path: |
             Interrogator.exe
     
@@ -113,11 +113,11 @@ jobs:
               make
               ls -R
               
-      - name: Upload Artifact
+      - name: Upload Artifact ${{github.os}}
         if: startsWith(matrix.os, 'ubuntu')
         uses: actions/upload-artifact@v3
         with:
-          name: Interrogator
+          name: Interrogator ${{github.os}}
           path: |
             Interrogator
               
@@ -139,7 +139,7 @@ jobs:
         if: startsWith(matrix.os, 'mac')
         uses: actions/upload-artifact@v3
         with:
-          name: interrogator.tar
+          name: Interrogator ${{github.os}}
           path: |
             interrogator.tar 
             
