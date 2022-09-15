@@ -22,7 +22,7 @@ jobs:
       matrix:
         # os: [windows-2019, macos-10.15]
 #         os: [windows, mac, linux]
-        os: [mac]
+        os: [macos-10.15]
         # os: [ubuntu-20.04, ubuntu-18.04, windows-2019, macos-10.15]
         # version: ['5.9.0', '5.15.1', '6.2.0']
         version: ['5.9.0']
@@ -35,10 +35,33 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Qt
+        if: startsWith(matrix.os, 'mac')
         uses: jurplel/install-qt-action@v2
         with:
           version: ${{matrix.version}}
-          host: ${{ matrix.os }}
+          host: mac
+          target: 'desktop'
+          # arch: 'win64_mingw73'
+          dir: '${{github.workspace}}/qt/'
+          install-deps: 'true'
+
+      - name: Install Qt
+        if: startsWith(matrix.os, 'windows')
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: ${{matrix.version}}
+          host: windows
+          target: 'desktop'
+          # arch: 'win64_mingw73'
+          dir: '${{github.workspace}}/qt/'
+          install-deps: 'true'
+          
+      - name: Install Qt
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: ${{matrix.version}}
+          host: linux
           target: 'desktop'
           # arch: 'win64_mingw73'
           dir: '${{github.workspace}}/qt/'
