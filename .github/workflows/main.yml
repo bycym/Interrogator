@@ -121,7 +121,7 @@ jobs:
         working-directory: ${{github.workspace}}
         run:  |
               qmake CONFIG+=release
-              cmake release
+              make release
               dir '${{github.workspace}}'
               
 #       - name: Build
