@@ -111,15 +111,15 @@ jobs:
         run:  |
               qmake CONFIG+=release
               make
-              ls -R
+              mv Interrogator LinuxInterrogator
               
       - name: Upload Artifact ${{github.os}}
         if: startsWith(matrix.os, 'ubuntu')
         uses: actions/upload-artifact@v3
         with:
-          name: Interrogator ${{github.os}}
+          name: LinuxInterrogator ${{github.os}}
           path: |
-            Interrogator
+            LinuxInterrogator
               
       - name: Build
         if: startsWith(matrix.os, 'mac')
@@ -133,15 +133,15 @@ jobs:
 
       - name: Tar files
         if: startsWith(matrix.os, 'mac')
-        run: tar -cvf interrogator.tar Interrogator.app
+        run: tar -cvf MacosInterrogator.tar Interrogator.app
 
       - name: Upload Artifact ${{github.os}}
         if: startsWith(matrix.os, 'mac')
         uses: actions/upload-artifact@v3
         with:
-          name: Interrogator ${{github.os}}
+          name: MacosInterrogator.tar ${{github.os}}
           path: |
-            interrogator.tar 
+            MacosInterrogator.tar 
             
 
 
