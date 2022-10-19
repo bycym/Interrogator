@@ -23,3 +23,7 @@ Known bugs:
 [Download](https://arcsibo.gumroad.com/l/ZvJvu)
 
 ![alt tag](https://github.com/arcsibo/Interrogator/blob/master/screenshot.png)
+
+
+## Build mac:
+qmake CONFIG+=release && make
