@@ -108,7 +108,7 @@ void MainWindow::on_actionOpen_file_2_triggered()
             this,
             "Open file...",
             path,
-            "Szövegfájlok(*.txt);;Minden fájl(*)"
+            "Szövegfájlok(*.txt, *.md);;Minden fájl(*)"
             );
     QStringList thingsToDo;
     qDebug() << fn;

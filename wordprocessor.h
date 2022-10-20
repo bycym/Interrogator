@@ -83,7 +83,8 @@ private:
     {
         TABULATOR = 0,
         OLDWAY,
-        COLON
+        COLON,
+        EQUAL
     };
 
     QMap<Separate, QString> _separate;

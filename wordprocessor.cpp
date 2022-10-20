@@ -12,6 +12,7 @@ wordProcessor::wordProcessor()
     _separate.insert(TABULATOR, "\t");
     _separate.insert(OLDWAY, " - ");
     _separate.insert(COLON, ":");
+    _separate.insert(EQUAL, "=");
 
     QString fileName = "words.txt";
     openFile(fileName);
@@ -227,7 +228,7 @@ bool wordProcessor::openFile(QString fileName)
     in.setCodec("UTF-8");
     while(!in.atEnd()) {
         QString line = in.readLine();
-        QStringList fields = line.split(_separate[TABULATOR]);
+        QStringList fields = line.split(_separate[EQUAL]);
         if(2 <= fields.size())
         {
             _words.push_back(fields);
