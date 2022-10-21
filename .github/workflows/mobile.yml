@@ -1,0 +1,65 @@
+name: CI for Interrogator
+
+on:
+  push:     
+    branches:
+      - main
+  pull_request: 
+    types: [opened, synchronize, reopened, closed]
+    
+env:
+  BUILD_TYPE: Release
+#   ACTIONS_RUNNER_DEBUG: true
+#   ACTIONS_STEP_DEBUG: true
+
+
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy: 
+      matrix:
+        os: [ubuntu-20.04]
+        #os: [macos-10.15, ubuntu-20.04, windows-2019]
+        # version: ['5.9.0', '5.15.1', '6.2.0']
+        version: ['5.9.0']
+
+        # Ubuntu 18 is not a supported target for Qt 6: https://www.qt.io/blog/qt6-development-hosts-and-targets
+        exclude:
+          - os: ubuntu-18.04
+            version: '6.2.0'
+    steps:
+      - uses: actions/checkout@v2
+          
+      - name: Install Qt
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: ${{matrix.version}}
+          host: linux
+          target: 'android'
+          arch: 'android_armv7'
+          dir: '${{github.workspace}}/qt/'
+          install-deps: 'true'
+
+      - name: Build
+        if: startsWith(matrix.os, 'ubuntu')
+        env:
+          ACTIONS_RUNNER_DEBUG: true
+          ACTIONS_STEP_DEBUG: true
+        working-directory: ${{github.workspace}}
+        run:  |
+              qmake CONFIG+=release
+              make
+              ls -l
+              mv Interrogator.apk AndroidInterrogator.apk
+              
+      - name: Upload Artifact ${{github.os}}
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: actions/upload-artifact@v3
+        with:
+          name: AndroidInterrogator.apk ${{github.os}}
+          path: |
+            AndroidInterrogator.apk
+          
