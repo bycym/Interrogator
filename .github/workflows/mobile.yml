@@ -1,4 +1,4 @@
-name: CI for Interrogator
+name: Mobile build CI for Interrogator
 
 on:
   push:     
