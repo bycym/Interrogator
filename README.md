@@ -1,6 +1,6 @@
 # Interrogator
 
-[![CI for Interrogator](https://github.com/bycym/Interrogator/actions/workflows/main.yml/badge.svg)](https://github.com/bycym/Interrogator/actions/workflows/main.yml)
+[![CI for Interrogator](https://github.com/bycym/Interrogator/actions/workflows/main.yml/badge.svg)](https://github.com/bycym/Interrogator/actions/workflows/main.yml) [![Mobile build CI for Interrogator](https://github.com/bycym/Interrogator/actions/workflows/mobile.yml/badge.svg)](https://github.com/bycym/Interrogator/actions/workflows/mobile.yml)
 
 Ask (e.g.) English words from (e.g.) hungarian. Made in Qt
 
