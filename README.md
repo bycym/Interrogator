@@ -1,4 +1,7 @@
 # Interrogator
+
+[![CI for Interrogator](https://github.com/bycym/Interrogator/actions/workflows/main.yml/badge.svg)](https://github.com/bycym/Interrogator/actions/workflows/main.yml)
+
 Ask (e.g.) English words from (e.g.) hungarian. Made in Qt
 
 The "word" .txt struct e.g.:
