@@ -8,6 +8,12 @@ The "word" .txt struct e.g.:
 
 word, word, word[tab]answer, answer
 
+preparation
+# for macos you have to do
+- copy `Interrogator.app` under `/Applications/`
+- `xattr -cr /Applications/Interrogator.app/`
+- then install qt5 `brew install qt@5`
+
 Feature:
 - open .txt files
 - ask wrongs answers only
