@@ -11,6 +11,18 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Interrogator
 TEMPLATE = app
 
+# Android specific configurations
+android {
+    QT += androidextras
+    
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+    
+    OTHER_FILES += \
+        android/AndroidManifest.xml \
+        android/build.gradle \
+        android/res/values/libs.xml
+}
+
 
 SOURCES += main.cpp\
         mainwindow.cpp \
