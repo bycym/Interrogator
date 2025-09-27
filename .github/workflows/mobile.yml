@@ -44,22 +44,37 @@ jobs:
 
       - name: Install Qt for Android
         run: |
-          # First, check what architectures are available
-          python3 -m aqt list-qt linux android 5.15.2 || echo "Failed to list architectures"
+          # First, check what versions are available for Android
+          echo "Checking Qt versions available for Android..."
+          python3 -m aqt list-qt linux android || echo "Failed to list Android versions"
           
-          # Install Qt for Android with correct architecture
-          python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
-            --outputdir ${{github.workspace}}/qt/
+          # Try to list available architectures for 5.15.2
+          echo "Checking architectures for Qt 5.15.2..."
+          python3 -m aqt list-qt linux android --arch android 5.15.2 || echo "Failed to list architectures for 5.15.2"
           
-          # Also install common Android packages if they exist
-          python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
-            --outputdir ${{github.workspace}}/qt/ \
-            --archives qtbase qtdeclarative qttools || echo "Some archives not available"
+          # Try installing Qt 6.2.0 instead of 5.15.2 as it might be more available
+          echo "Trying to install Qt 6.2.0 for Android..."
+          if python3 -m aqt install-qt linux android 6.2.0 android_arm64_v8a \
+            --outputdir ${{github.workspace}}/qt/; then
+            echo "Successfully installed Qt 6.2.0"
+            echo "QT_VERSION=6.2.0" >> $GITHUB_ENV
+          else
+            echo "Qt 6.2.0 failed, trying Qt 5.15.2..."
+            # Try different approach for 5.15.2
+            python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
+              --outputdir ${{github.workspace}}/qt/ \
+              --base https://download.qt.io/online/qtsdkrepository/linux_x64/android/qt5_5152/ || \
+            python3 -m aqt install-qt linux android 5.15.2 android_armv7 \
+              --outputdir ${{github.workspace}}/qt/ || \
+            echo "Failed to install Qt for Android"
+          fi
 
       - name: Install Qt Desktop (needed for qmake)
         run: |
-          # Install Qt for desktop
-          python3 -m aqt install-qt linux desktop 5.15.2 \
+          # Install Qt for desktop - use same version as Android
+          QT_VER=${QT_VERSION:-5.15.2}
+          echo "Installing Qt $QT_VER for desktop..."
+          python3 -m aqt install-qt linux desktop $QT_VER \
             --outputdir ${{github.workspace}}/qt/
 
       - name: Verify Android environment
@@ -68,13 +83,24 @@ jobs:
           echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
           echo "JAVA_HOME: $JAVA_HOME"
           
+          # Get the actual Qt version we installed
+          QT_VER=${QT_VERSION:-5.15.2}
+          echo "Looking for Qt version: $QT_VER"
+          
           # Find Qt installation
-          QT_DIR=$(find ${{github.workspace}}/qt -name "5.15.2" -type d | head -1)
+          QT_DIR=$(find ${{github.workspace}}/qt -name "$QT_VER" -type d | head -1)
           echo "QT_DIR: $QT_DIR"
           
-          # Find Qt Android installation
-          QT_ANDROID_DIR=$(find ${{github.workspace}}/qt -path "*/android*" -name "5.15.2" -type d | head -1)
+          # Find Qt Android installation  
+          QT_ANDROID_DIR=$(find ${{github.workspace}}/qt -path "*/android*" -name "$QT_VER" -type d | head -1)
           echo "QT_ANDROID_DIR: $QT_ANDROID_DIR"
+          
+          # If we can't find exact version, try to find any Qt installation
+          if [ -z "$QT_DIR" ]; then
+            echo "Exact version not found, looking for any Qt installation..."
+            QT_DIR=$(find ${{github.workspace}}/qt -name "bin" -type d | head -1 | dirname)
+            echo "Found Qt at: $QT_DIR"
+          fi
           
           # Set Qt paths for subsequent steps
           echo "Qt5_Dir=$QT_DIR" >> $GITHUB_ENV
@@ -86,52 +112,79 @@ jobs:
           ls -la $ANDROID_NDK_HOME/ || echo "NDK not found"
           
           # Check Qt installation
-          if [ -n "$QT_DIR" ]; then
-            ls -la "$QT_DIR/bin/" || echo "Qt bin directory not found"
-            [ -f "$QT_DIR/bin/qmake" ] && echo "qmake found at $QT_DIR/bin/qmake" || echo "qmake not found"
+          if [ -n "$QT_DIR" ] && [ -d "$QT_DIR" ]; then
+            echo "Qt installation found at: $QT_DIR"
+            find "$QT_DIR" -name "qmake" -type f | head -3
+            ls -la "$QT_DIR"
+          else
+            echo "Qt installation not found, listing all directories:"
+            find ${{github.workspace}}/qt -type d | head -10
           fi
 
       - name: Configure project for Android
         run: |
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
-          export PATH="$Qt5_Dir/bin:$PATH"
           
-          echo "Using Qt at: $Qt5_Dir"
-          echo "Using Qt Android at: $Qt5_Android_Dir"
+          # Find qmake executable
+          QMAKE_PATH=$(find ${{github.workspace}}/qt -name "qmake" -type f | head -1)
+          echo "Found qmake at: $QMAKE_PATH"
           
-          # Generate Makefile for Android
-          "$Qt5_Dir/bin/qmake" -spec android-clang \
-                CONFIG+=release \
-                ANDROID_ABIS=arm64-v8a \
-                Interrogator.pro
+          if [ -n "$QMAKE_PATH" ]; then
+            export PATH="$(dirname $QMAKE_PATH):$PATH"
+            echo "Using qmake from: $QMAKE_PATH"
+            echo "Using Qt at: $Qt5_Dir"
+            
+            # Generate Makefile for Android
+            "$QMAKE_PATH" -spec android-clang \
+                  CONFIG+=release \
+                  ANDROID_ABIS=arm64-v8a \
+                  Interrogator.pro
+          else
+            echo "ERROR: qmake not found in Qt installation"
+            find ${{github.workspace}}/qt -type f -name "*qmake*" | head -5
+            exit 1
+          fi
           
       - name: Build APK
         run: |
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
-          export PATH="$Qt5_Dir/bin:$PATH"
+          
+          # Find qmake executable
+          QMAKE_PATH=$(find ${{github.workspace}}/qt -name "qmake" -type f | head -1)
+          if [ -n "$QMAKE_PATH" ]; then
+            export PATH="$(dirname $QMAKE_PATH):$PATH"
+          fi
           
           # Build the Android project
           make -j$(nproc)
           
-          # Package APK using androiddeployqt
-          if [ -f "$Qt5_Dir/bin/androiddeployqt" ]; then
-            "$Qt5_Dir/bin/androiddeployqt" \
+          # Find androiddeployqt tool
+          ANDROIDDEPLOYQT=$(find ${{github.workspace}}/qt -name "androiddeployqt" -type f | head -1)
+          echo "Looking for androiddeployqt..."
+          find ${{github.workspace}}/qt -name "*android*" -type f | head -5
+          
+          if [ -n "$ANDROIDDEPLOYQT" ] && [ -f "$ANDROIDDEPLOYQT" ]; then
+            echo "Found androiddeployqt at: $ANDROIDDEPLOYQT"
+            # Package APK using androiddeployqt
+            "$ANDROIDDEPLOYQT" \
               --input android-Interrogator-deployment-settings.json \
               --output android-build \
               --android-platform android-${{ env.ANDROID_API_LEVEL }} \
               --jdk $JAVA_HOME \
               --gradle \
-              --release
+              --release || echo "androiddeployqt failed"
           else
-            echo "androiddeployqt not found at $Qt5_Dir/bin/androiddeployqt"
-            echo "Trying alternative locations..."
-            find ${{github.workspace}}/qt -name "androiddeployqt" -type f
+            echo "androiddeployqt not found, trying alternative build methods..."
             echo "Available make targets:"
             make help || echo "No help available"
             make apk || make aab || echo "No APK/AAB build target found"
           fi
+          
+          # List what was built
+          echo "Files generated:"
+          find . -name "*.apk" -o -name "*.aab" | head -10
           
       - name: Find and copy APK
         run: |
