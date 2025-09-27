@@ -37,48 +37,71 @@ jobs:
           build-tools: ${{ env.ANDROID_BUILD_TOOLS_VERSION }}
           ndk-version: ${{ env.ANDROID_NDK_VERSION }}
 
+      - name: Install aqt
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install aqtinstall==3.1.*
+
       - name: Install Qt for Android
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: ${{ env.QT_VERSION }}
-          host: 'linux'
-          target: 'android'
-          arch: 'android_arm64_v8a'
-          dir: '${{github.workspace}}/qt/'
-          install-deps: 'true'
-          setup-python: 'false'
+        run: |
+          # First, check what architectures are available
+          python3 -m aqt list-qt linux android 5.15.2 || echo "Failed to list architectures"
+          
+          # Install Qt for Android with correct architecture
+          python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
+            --outputdir ${{github.workspace}}/qt/
+          
+          # Also install common Android packages if they exist
+          python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
+            --outputdir ${{github.workspace}}/qt/ \
+            --archives qtbase qtdeclarative qttools || echo "Some archives not available"
 
       - name: Install Qt Desktop (needed for qmake)
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: ${{ env.QT_VERSION }}
-          host: 'linux'
-          target: 'desktop'
-          dir: '${{github.workspace}}/qt/'
-          install-deps: 'true'
-          setup-python: 'false'
+        run: |
+          # Install Qt for desktop
+          python3 -m aqt install-qt linux desktop 5.15.2 \
+            --outputdir ${{github.workspace}}/qt/
 
       - name: Verify Android environment
         run: |
           echo "ANDROID_HOME: $ANDROID_HOME"
           echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
-          echo "Qt5_Dir: $Qt5_Dir"
-          echo "PATH: $PATH"
+          echo "JAVA_HOME: $JAVA_HOME"
+          
+          # Find Qt installation
+          QT_DIR=$(find ${{github.workspace}}/qt -name "5.15.2" -type d | head -1)
+          echo "QT_DIR: $QT_DIR"
+          
+          # Find Qt Android installation
+          QT_ANDROID_DIR=$(find ${{github.workspace}}/qt -path "*/android*" -name "5.15.2" -type d | head -1)
+          echo "QT_ANDROID_DIR: $QT_ANDROID_DIR"
+          
+          # Set Qt paths for subsequent steps
+          echo "Qt5_Dir=$QT_DIR" >> $GITHUB_ENV
+          echo "Qt5_Android_Dir=$QT_ANDROID_DIR" >> $GITHUB_ENV
           
           # Check if required tools exist
-          which qmake || echo "qmake not found"
           which make || echo "make not found"
           ls -la $ANDROID_HOME/platforms/ || echo "No Android platforms found"
           ls -la $ANDROID_NDK_HOME/ || echo "NDK not found"
+          
+          # Check Qt installation
+          if [ -n "$QT_DIR" ]; then
+            ls -la "$QT_DIR/bin/" || echo "Qt bin directory not found"
+            [ -f "$QT_DIR/bin/qmake" ] && echo "qmake found at $QT_DIR/bin/qmake" || echo "qmake not found"
+          fi
 
       - name: Configure project for Android
         run: |
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
-          export PATH=$Qt5_Dir/bin:$PATH
+          export PATH="$Qt5_Dir/bin:$PATH"
+          
+          echo "Using Qt at: $Qt5_Dir"
+          echo "Using Qt Android at: $Qt5_Android_Dir"
           
           # Generate Makefile for Android
-          qmake -spec android-clang \
+          "$Qt5_Dir/bin/qmake" -spec android-clang \
                 CONFIG+=release \
                 ANDROID_ABIS=arm64-v8a \
                 Interrogator.pro
@@ -87,14 +110,14 @@ jobs:
         run: |
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
-          export PATH=$Qt5_Dir/bin:$PATH
+          export PATH="$Qt5_Dir/bin:$PATH"
           
           # Build the Android project
           make -j$(nproc)
           
           # Package APK using androiddeployqt
           if [ -f "$Qt5_Dir/bin/androiddeployqt" ]; then
-            $Qt5_Dir/bin/androiddeployqt \
+            "$Qt5_Dir/bin/androiddeployqt" \
               --input android-Interrogator-deployment-settings.json \
               --output android-build \
               --android-platform android-${{ env.ANDROID_API_LEVEL }} \
@@ -102,8 +125,12 @@ jobs:
               --gradle \
               --release
           else
-            echo "androiddeployqt not found, trying alternative build"
-            make apk || make aab || echo "No APK build target found"
+            echo "androiddeployqt not found at $Qt5_Dir/bin/androiddeployqt"
+            echo "Trying alternative locations..."
+            find ${{github.workspace}}/qt -name "androiddeployqt" -type f
+            echo "Available make targets:"
+            make help || echo "No help available"
+            make apk || make aab || echo "No APK/AAB build target found"
           fi
           
       - name: Find and copy APK
