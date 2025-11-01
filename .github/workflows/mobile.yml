@@ -77,27 +77,31 @@ jobs:
           echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
           echo "JAVA_HOME: $JAVA_HOME"
           
-          # We're using Qt 5.15.2
-          echo "Looking for Qt 5.15.2..."
+          # We're using Qt 5.15.2 for Android
+          echo "Looking for Qt 5.15.2 Android installation..."
           
           # Find Qt installations
           echo "Qt directory structure:"
-          find ${{github.workspace}}/qt -name "5.15.2" -type d || echo "No 5.15.2 directories found"
+          find ${{github.workspace}}/qt -name "5.15.2" -type d
           
-          # Find qmake to determine Qt location
-          QMAKE_PATH=$(find ${{github.workspace}}/qt -name "qmake" -type f | head -1)
-          if [ -n "$QMAKE_PATH" ]; then
-            QT_DIR=$(dirname $(dirname "$QMAKE_PATH"))
-            echo "Qt installation found at: $QT_DIR"
-            echo "Qt5_Dir=$QT_DIR" >> $GITHUB_ENV
+          # Find Android qmake specifically (not desktop qmake)
+          # Android Qt is typically in paths containing "android"
+          ANDROID_QMAKE=$(find ${{github.workspace}}/qt -path "*/android*/bin/qmake" -type f | head -1)
+          
+          if [ -n "$ANDROID_QMAKE" ]; then
+            ANDROID_QT_DIR=$(dirname $(dirname "$ANDROID_QMAKE"))
+            echo "Android Qt installation found at: $ANDROID_QT_DIR"
+            echo "Android qmake found at: $ANDROID_QMAKE"
+            echo "ANDROID_QT_DIR=$ANDROID_QT_DIR" >> $GITHUB_ENV
+            echo "ANDROID_QMAKE=$ANDROID_QMAKE" >> $GITHUB_ENV
             
             # Verify qmake version
-            echo "qmake version:"
-            "$QMAKE_PATH" -version || echo "Failed to get qmake version"
+            echo "Android qmake version:"
+            "$ANDROID_QMAKE" -version
           else
-            echo "ERROR: qmake not found"
-            echo "Listing all Qt files:"
-            find ${{github.workspace}}/qt -type f | head -20
+            echo "ERROR: Android qmake not found"
+            echo "Listing all qmake files:"
+            find ${{github.workspace}}/qt -name "qmake" -type f
             exit 1
           fi
           
@@ -111,23 +115,21 @@ jobs:
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
           
-          # Find qmake executable
-          QMAKE_PATH=$(find ${{github.workspace}}/qt -name "qmake" -type f | head -1)
-          echo "Found qmake at: $QMAKE_PATH"
+          # Use the Android qmake we found earlier
+          echo "Using Android qmake from: $ANDROID_QMAKE"
+          echo "Using Android Qt at: $ANDROID_QT_DIR"
           
-          if [ -n "$QMAKE_PATH" ]; then
-            export PATH="$(dirname $QMAKE_PATH):$PATH"
-            echo "Using qmake from: $QMAKE_PATH"
-            echo "Using Qt at: $Qt5_Dir"
+          if [ -n "$ANDROID_QMAKE" ] && [ -f "$ANDROID_QMAKE" ]; then
+            export PATH="$(dirname $ANDROID_QMAKE):$PATH"
             
             # Generate Makefile for Android
-            "$QMAKE_PATH" -spec android-clang \
+            "$ANDROID_QMAKE" -spec android-clang \
                   CONFIG+=release \
                   ANDROID_ABIS=arm64-v8a \
                   Interrogator.pro
           else
-            echo "ERROR: qmake not found in Qt installation"
-            find ${{github.workspace}}/qt -type f -name "*qmake*" | head -5
+            echo "ERROR: Android qmake not found at $ANDROID_QMAKE"
+            find ${{github.workspace}}/qt -name "qmake" -type f
             exit 1
           fi
           
@@ -136,20 +138,23 @@ jobs:
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
           
-          # Find qmake executable
-          QMAKE_PATH=$(find ${{github.workspace}}/qt -name "qmake" -type f | head -1)
-          if [ -n "$QMAKE_PATH" ]; then
-            export PATH="$(dirname $QMAKE_PATH):$PATH"
+          # Use the Android qmake path
+          if [ -n "$ANDROID_QMAKE" ]; then
+            export PATH="$(dirname $ANDROID_QMAKE):$PATH"
           fi
           
           # Build the Android project
           make -j$(nproc)
           
-          # Find androiddeployqt tool
-          ANDROIDDEPLOYQT=$(find ${{github.workspace}}/qt -name "androiddeployqt" -type f | head -1)
-          echo "Looking for androiddeployqt..."
-          find ${{github.workspace}}/qt -name "*android*" -type f | head -5
+          # Find androiddeployqt tool in the Android Qt directory
+          ANDROIDDEPLOYQT=$(find $ANDROID_QT_DIR -name "androiddeployqt" -type f | head -1)
           
+          if [ -z "$ANDROIDDEPLOYQT" ]; then
+            # Try searching in the whole Qt directory
+            ANDROIDDEPLOYQT=$(find ${{github.workspace}}/qt -path "*/android*/bin/androiddeployqt" -type f | head -1)
+          fi
+          
+          echo "Looking for androiddeployqt..."
           if [ -n "$ANDROIDDEPLOYQT" ] && [ -f "$ANDROIDDEPLOYQT" ]; then
             echo "Found androiddeployqt at: $ANDROIDDEPLOYQT"
             # Package APK using androiddeployqt
