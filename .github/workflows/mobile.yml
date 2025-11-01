@@ -44,37 +44,31 @@ jobs:
 
       - name: Install Qt for Android
         run: |
-          # First, check what versions are available for Android
-          echo "Checking Qt versions available for Android..."
-          python3 -m aqt list-qt linux android || echo "Failed to list Android versions"
+          # Use Qt 5.15.2 specifically since the project uses androidextras module
+          # which was removed in Qt 6.x
+          echo "Installing Qt 5.15.2 for Android (required for androidextras module)..."
           
-          # Try to list available architectures for 5.15.2
-          echo "Checking architectures for Qt 5.15.2..."
-          python3 -m aqt list-qt linux android --arch android 5.15.2 || echo "Failed to list architectures for 5.15.2"
-          
-          # Try installing Qt 6.2.0 instead of 5.15.2 as it might be more available
-          echo "Trying to install Qt 6.2.0 for Android..."
-          if python3 -m aqt install-qt linux android 6.2.0 android_arm64_v8a \
+          # Try android_arm64_v8a first (most common modern architecture)
+          if python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
             --outputdir ${{github.workspace}}/qt/; then
-            echo "Successfully installed Qt 6.2.0"
-            echo "QT_VERSION=6.2.0" >> $GITHUB_ENV
+            echo "Successfully installed Qt 5.15.2 for android_arm64_v8a"
+          elif python3 -m aqt install-qt linux android 5.15.2 android_armv7 \
+            --outputdir ${{github.workspace}}/qt/; then
+            echo "Successfully installed Qt 5.15.2 for android_armv7"
           else
-            echo "Qt 6.2.0 failed, trying Qt 5.15.2..."
-            # Try different approach for 5.15.2
+            echo "Failed to install Qt 5.15.2 via aqt, trying with modules specification..."
+            # Try with explicit modules
             python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
-              --outputdir ${{github.workspace}}/qt/ \
-              --base https://download.qt.io/online/qtsdkrepository/linux_x64/android/qt5_5152/ || \
-            python3 -m aqt install-qt linux android 5.15.2 android_armv7 \
-              --outputdir ${{github.workspace}}/qt/ || \
-            echo "Failed to install Qt for Android"
+              -m qtcharts qtdatavis3d qtpurchasing qtvirtualkeyboard qtwebengine qtnetworkauth \
+              qtwebglplugin qtscript --outputdir ${{github.workspace}}/qt/ || \
+            echo "All Qt installation attempts failed"
           fi
 
       - name: Install Qt Desktop (needed for qmake)
         run: |
-          # Install Qt for desktop - use same version as Android
-          QT_VER=${QT_VERSION:-5.15.2}
-          echo "Installing Qt $QT_VER for desktop..."
-          python3 -m aqt install-qt linux desktop $QT_VER \
+          # Install Qt 5.15.2 for desktop to match Android version
+          echo "Installing Qt 5.15.2 for desktop..."
+          python3 -m aqt install-qt linux desktop 5.15.2 gcc_64 \
             --outputdir ${{github.workspace}}/qt/
 
       - name: Verify Android environment
@@ -83,43 +77,34 @@ jobs:
           echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
           echo "JAVA_HOME: $JAVA_HOME"
           
-          # Get the actual Qt version we installed
-          QT_VER=${QT_VERSION:-5.15.2}
-          echo "Looking for Qt version: $QT_VER"
+          # We're using Qt 5.15.2
+          echo "Looking for Qt 5.15.2..."
           
-          # Find Qt installation
-          QT_DIR=$(find ${{github.workspace}}/qt -name "$QT_VER" -type d | head -1)
-          echo "QT_DIR: $QT_DIR"
+          # Find Qt installations
+          echo "Qt directory structure:"
+          find ${{github.workspace}}/qt -name "5.15.2" -type d || echo "No 5.15.2 directories found"
           
-          # Find Qt Android installation  
-          QT_ANDROID_DIR=$(find ${{github.workspace}}/qt -path "*/android*" -name "$QT_VER" -type d | head -1)
-          echo "QT_ANDROID_DIR: $QT_ANDROID_DIR"
-          
-          # If we can't find exact version, try to find any Qt installation
-          if [ -z "$QT_DIR" ]; then
-            echo "Exact version not found, looking for any Qt installation..."
-            QT_DIR=$(find ${{github.workspace}}/qt -name "bin" -type d | head -1 | dirname)
-            echo "Found Qt at: $QT_DIR"
+          # Find qmake to determine Qt location
+          QMAKE_PATH=$(find ${{github.workspace}}/qt -name "qmake" -type f | head -1)
+          if [ -n "$QMAKE_PATH" ]; then
+            QT_DIR=$(dirname $(dirname "$QMAKE_PATH"))
+            echo "Qt installation found at: $QT_DIR"
+            echo "Qt5_Dir=$QT_DIR" >> $GITHUB_ENV
+            
+            # Verify qmake version
+            echo "qmake version:"
+            "$QMAKE_PATH" -version || echo "Failed to get qmake version"
+          else
+            echo "ERROR: qmake not found"
+            echo "Listing all Qt files:"
+            find ${{github.workspace}}/qt -type f | head -20
+            exit 1
           fi
-          
-          # Set Qt paths for subsequent steps
-          echo "Qt5_Dir=$QT_DIR" >> $GITHUB_ENV
-          echo "Qt5_Android_Dir=$QT_ANDROID_DIR" >> $GITHUB_ENV
           
           # Check if required tools exist
           which make || echo "make not found"
           ls -la $ANDROID_HOME/platforms/ || echo "No Android platforms found"
           ls -la $ANDROID_NDK_HOME/ || echo "NDK not found"
-          
-          # Check Qt installation
-          if [ -n "$QT_DIR" ] && [ -d "$QT_DIR" ]; then
-            echo "Qt installation found at: $QT_DIR"
-            find "$QT_DIR" -name "qmake" -type f | head -3
-            ls -la "$QT_DIR"
-          else
-            echo "Qt installation not found, listing all directories:"
-            find ${{github.workspace}}/qt -type d | head -10
-          fi
 
       - name: Configure project for Android
         run: |
