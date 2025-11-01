@@ -152,6 +152,8 @@ jobs:
 
       - name: Configure project for Android
         run: |
+          set -e  # Exit immediately if any command fails
+          
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
           
@@ -163,10 +165,14 @@ jobs:
             export PATH="$(dirname $ANDROID_QMAKE):$PATH"
             
             # Generate Makefile for Android
-            "$ANDROID_QMAKE" -spec android-clang \
+            echo "Configuring project with qmake..."
+            if ! "$ANDROID_QMAKE" -spec android-clang \
                   CONFIG+=release \
                   ANDROID_ABIS=arm64-v8a \
-                  Interrogator.pro
+                  Interrogator.pro; then
+              echo "ERROR: qmake configuration failed"
+              exit 1
+            fi
           else
             echo "ERROR: Android qmake not found at $ANDROID_QMAKE"
             find ${{github.workspace}}/qt -name "qmake" -type f
@@ -175,6 +181,8 @@ jobs:
           
       - name: Build APK
         run: |
+          set -e  # Exit immediately if any command fails
+          
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
           
@@ -184,7 +192,11 @@ jobs:
           fi
           
           # Build the Android project
-          make -j$(nproc)
+          echo "Building Android project with make..."
+          if ! make -j$(nproc); then
+            echo "ERROR: Make build failed"
+            exit 1
+          fi
           
           # Find androiddeployqt tool in the Android Qt directory
           ANDROIDDEPLOYQT=$(find $ANDROID_QT_DIR -name "androiddeployqt" -type f | head -1)
@@ -198,18 +210,21 @@ jobs:
           if [ -n "$ANDROIDDEPLOYQT" ] && [ -f "$ANDROIDDEPLOYQT" ]; then
             echo "Found androiddeployqt at: $ANDROIDDEPLOYQT"
             # Package APK using androiddeployqt
-            "$ANDROIDDEPLOYQT" \
+            echo "Generating APK with androiddeployqt..."
+            if ! "$ANDROIDDEPLOYQT" \
               --input android-Interrogator-deployment-settings.json \
               --output android-build \
               --android-platform android-${{ env.ANDROID_API_LEVEL }} \
               --jdk $JAVA_HOME \
               --gradle \
-              --release || echo "androiddeployqt failed"
+              --release; then
+              echo "ERROR: androiddeployqt failed"
+              exit 1
+            fi
           else
-            echo "androiddeployqt not found, trying alternative build methods..."
-            echo "Available make targets:"
-            make help || echo "No help available"
-            make apk || make aab || echo "No APK/AAB build target found"
+            echo "ERROR: androiddeployqt not found"
+            echo "Cannot package APK without androiddeployqt"
+            exit 1
           fi
           
           # List what was built
@@ -218,6 +233,8 @@ jobs:
           
       - name: Find and copy APK
         run: |
+          set -e  # Exit immediately if any command fails
+          
           # Look for generated APK files
           echo "Searching for APK files..."
           find . -name "*.apk" -type f
@@ -229,7 +246,7 @@ jobs:
             echo "Found APK: $APK_FILE"
             ls -la AndroidInterrogator.apk
           else
-            echo "No APK found, checking for AAB files..."
+            echo "WARNING: No APK found, checking for AAB files..."
             find . -name "*.aab" -type f
             
             # If AAB exists, we'd need bundletool to convert to APK
@@ -238,6 +255,10 @@ jobs:
               echo "Found AAB: $AAB_FILE"
               # For now, just copy the AAB as the output
               cp "$AAB_FILE" AndroidInterrogator.aab
+            else
+              echo "ERROR: No APK or AAB files were generated"
+              echo "Build appears to have failed"
+              exit 1
             fi
           fi
           
