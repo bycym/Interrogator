@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <manifest package="org.qtproject.interrogator" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.0" android:versionCode="1" android:installLocation="auto">
-    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="Interrogator" android:extractNativeLibs="true">
+    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt.android.bindings.QtApplication" android:label="Interrogator" android:extractNativeLibs="true">
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" 
-                  android:name="org.qtproject.qt5.android.bindings.QtActivity" 
+                  android:name="org.qtproject.qt.android.bindings.QtActivity" 
                   android:label="Interrogator" 
                   android:screenOrientation="unspecified" 
                   android:launchMode="singleTop"
@@ -70,7 +70,7 @@
 
     </application>
 
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="30"/>
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="30"/>
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
 
     <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
