@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      QT_VERSION: '5.15.2'
+      QT_VERSION: '6.5.3'
       ANDROID_API_LEVEL: '30'
       ANDROID_BUILD_TOOLS_VERSION: '30.0.3'
       ANDROID_NDK_VERSION: '21.4.7075529'
@@ -44,20 +44,20 @@ jobs:
 
       - name: Install Qt for Android
         run: |
-          # Use Qt 5.15.2 specifically since the project uses androidextras module
-          # which was removed in Qt 6.x
-          echo "Installing Qt 5.15.2 for Android (required for androidextras module)..."
+          # Use Qt 6.5.3 which has better Android support and availability
+          # androidextras is not needed in Qt 6 (integrated into Qt Core)
+          echo "Installing Qt 6.5.3 for Android..."
           
           # Try android_arm64_v8a first (most common modern architecture)
-          echo "Attempting to install Qt 5.15.2 for android_arm64_v8a..."
-          if python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
+          echo "Attempting to install Qt 6.5.3 for android_arm64_v8a..."
+          if python3 -m aqt install-qt linux android 6.5.3 android_arm64_v8a \
             --outputdir ${{github.workspace}}/qt/; then
-            echo "Successfully installed Qt 5.15.2 for android_arm64_v8a"
-          elif python3 -m aqt install-qt linux android 5.15.2 android_armv7 \
+            echo "Successfully installed Qt 6.5.3 for android_arm64_v8a"
+          elif python3 -m aqt install-qt linux android 6.5.3 android_armv7 \
             --outputdir ${{github.workspace}}/qt/; then
-            echo "Successfully installed Qt 5.15.2 for android_armv7"
+            echo "Successfully installed Qt 6.5.3 for android_armv7"
           else
-            echo "ERROR: Failed to install Qt 5.15.2 for Android"
+            echo "ERROR: Failed to install Qt 6.5.3 for Android"
             echo "Trying to list available versions and architectures..."
             python3 -m aqt list-qt linux android || true
             exit 1
@@ -76,9 +76,9 @@ jobs:
 
       - name: Install Qt Desktop (needed for qmake)
         run: |
-          # Install Qt 5.15.2 for desktop to match Android version
-          echo "Installing Qt 5.15.2 for desktop..."
-          python3 -m aqt install-qt linux desktop 5.15.2 gcc_64 \
+          # Install Qt 6.5.3 for desktop to match Android version
+          echo "Installing Qt 6.5.3 for desktop..."
+          python3 -m aqt install-qt linux desktop 6.5.3 gcc_64 \
             --outputdir ${{github.workspace}}/qt/
 
       - name: Verify Android environment
@@ -87,12 +87,12 @@ jobs:
           echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
           echo "JAVA_HOME: $JAVA_HOME"
           
-          # We're using Qt 5.15.2 for Android
-          echo "Looking for Qt 5.15.2 Android installation..."
+          # We're using Qt 6.5.3 for Android
+          echo "Looking for Qt 6.5.3 Android installation..."
           
           # Find Qt installations
           echo "Qt directory structure:"
-          find ${{github.workspace}}/qt -name "5.15.2" -type d
+          find ${{github.workspace}}/qt -name "6.5.3" -type d
           
           # Find Android qmake specifically (not desktop qmake)
           # Android Qt is typically in paths containing "android"

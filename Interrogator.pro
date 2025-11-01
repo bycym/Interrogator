@@ -13,7 +13,10 @@ TEMPLATE = app
 
 # Android specific configurations
 android {
-    QT += androidextras
+    # androidextras module was removed in Qt 6.0
+    # Its functionality is now part of Qt Core
+    greaterThan(QT_MAJOR_VERSION, 5): QT += core-private
+    equals(QT_MAJOR_VERSION, 5): QT += androidextras
     
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
     
