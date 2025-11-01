@@ -49,6 +49,7 @@ jobs:
           echo "Installing Qt 5.15.2 for Android (required for androidextras module)..."
           
           # Try android_arm64_v8a first (most common modern architecture)
+          echo "Attempting to install Qt 5.15.2 for android_arm64_v8a..."
           if python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
             --outputdir ${{github.workspace}}/qt/; then
             echo "Successfully installed Qt 5.15.2 for android_arm64_v8a"
@@ -56,12 +57,21 @@ jobs:
             --outputdir ${{github.workspace}}/qt/; then
             echo "Successfully installed Qt 5.15.2 for android_armv7"
           else
-            echo "Failed to install Qt 5.15.2 via aqt, trying with modules specification..."
-            # Try with explicit modules
-            python3 -m aqt install-qt linux android 5.15.2 android_arm64_v8a \
-              -m qtcharts qtdatavis3d qtpurchasing qtvirtualkeyboard qtwebengine qtnetworkauth \
-              qtwebglplugin qtscript --outputdir ${{github.workspace}}/qt/ || \
-            echo "All Qt installation attempts failed"
+            echo "ERROR: Failed to install Qt 5.15.2 for Android"
+            echo "Trying to list available versions and architectures..."
+            python3 -m aqt list-qt linux android || true
+            exit 1
+          fi
+          
+          # Verify Android Qt was actually installed
+          echo "Verifying Android Qt installation..."
+          if find ${{github.workspace}}/qt -path "*/android*/bin/qmake" -type f | grep -q .; then
+            echo "Android Qt qmake found - installation successful"
+          else
+            echo "ERROR: Android Qt installation failed - no Android qmake found"
+            echo "Directory structure:"
+            ls -la ${{github.workspace}}/qt/
+            exit 1
           fi
 
       - name: Install Qt Desktop (needed for qmake)
