@@ -1,0 +1,54 @@
+# Docker ignore file for Android build
+
+# Build artifacts
+android-build/
+*.apk
+*.aab
+*.o
+*.so
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+.qmake.stash
+Makefile
+
+# Qt Creator files
+*.pro.user
+*.pro.user.*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+
+# Documentation (optional, comment out if you want to include)
+*.md
+!BUILD_ANDROID_LOCAL.md
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Qt cache
+qt/
+
+# Logs
+*.log
