@@ -9,57 +9,277 @@ on:
     
 env:
   BUILD_TYPE: Release
-#   ACTIONS_RUNNER_DEBUG: true
-#   ACTIONS_STEP_DEBUG: true
-
 
 jobs:
-  ci:
-    runs-on: ${{ matrix.os }}
+  android-build:
+    runs-on: ubuntu-22.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    strategy: 
-      matrix:
-        os: [ubuntu-20.04]
-        #os: [macos-10.15, ubuntu-20.04, windows-2019]
-        # version: ['5.9.0', '5.15.1', '6.2.0']
-        version: ['5.9.0']
-
-        # Ubuntu 18 is not a supported target for Qt 6: https://www.qt.io/blog/qt6-development-hosts-and-targets
-        exclude:
-          - os: ubuntu-18.04
-            version: '6.2.0'
+      QT_VERSION: '6.5.3'
+      ANDROID_API_LEVEL: '34'
+      ANDROID_BUILD_TOOLS_VERSION: '34.0.0'
+      ANDROID_NDK_VERSION: '21.4.7075529'
+      
     steps:
-      - uses: actions/checkout@v2
-          
-      - name: Install Qt
-        if: startsWith(matrix.os, 'ubuntu')
-        uses: jurplel/install-qt-action@v2
-        with:
-          version: ${{matrix.version}}
-          host: linux
-          target: 'android'
-          arch: 'android_armv7'
-          dir: '${{github.workspace}}/qt/'
-          install-deps: 'true'
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Build
-        if: startsWith(matrix.os, 'ubuntu')
-        env:
-          ACTIONS_RUNNER_DEBUG: true
-          ACTIONS_STEP_DEBUG: true
-        working-directory: ${{github.workspace}}
-        run:  |
-              qmake CONFIG+=release
-              make
-              ls -l
-              mv Interrogator.apk AndroidInterrogator.apk
-              
-      - name: Upload Artifact ${{github.os}}
-        if: startsWith(matrix.os, 'ubuntu')
-        uses: actions/upload-artifact@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          name: AndroidInterrogator.apk ${{github.os}}
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: ${{ env.ANDROID_API_LEVEL }}
+          build-tools: ${{ env.ANDROID_BUILD_TOOLS_VERSION }}
+          ndk-version: ${{ env.ANDROID_NDK_VERSION }}
+      
+      - name: Configure Android SDK Environment
+        run: |
+          # Ensure correct Android platform is available
+          echo "ANDROID_HOME: $ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
+          
+          # List installed platforms BEFORE cleanup
+          echo "Installed Android platforms BEFORE cleanup:"
+          ls -la $ANDROID_HOME/platforms/ || true
+          
+          # CRITICAL: Remove corrupted SDK platforms 35 and 36 that cause aapt2 linking errors
+          echo "Removing corrupted Android SDK platforms 35 and 36..."
+          rm -rf $ANDROID_HOME/platforms/android-35* || true
+          rm -rf $ANDROID_HOME/platforms/android-36* || true
+          
+          # Ensure we have SDK platform 34
+          if [ ! -d "$ANDROID_HOME/platforms/android-34" ]; then
+            echo "Installing Android SDK Platform 34..."
+            yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-34"
+          fi
+          
+          # List installed platforms AFTER cleanup
+          echo "Installed Android platforms AFTER cleanup:"
+          ls -la $ANDROID_HOME/platforms/ || true
+          
+          # Set ANDROID_SDK_ROOT if not set
+          if [ -z "$ANDROID_SDK_ROOT" ]; then
+            echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          fi
+
+      - name: Install aqt
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install aqtinstall==3.1.*
+
+      - name: Install Qt for Android
+        run: |
+          # Use Qt 6.5.3 which has better Android support and availability
+          # androidextras is not needed in Qt 6 (integrated into Qt Core)
+          echo "Installing Qt 6.5.3 for Android..."
+          
+          # Try android_arm64_v8a first (most common modern architecture)
+          echo "Attempting to install Qt 6.5.3 for android_arm64_v8a..."
+          if python3 -m aqt install-qt linux android 6.5.3 android_arm64_v8a \
+            --outputdir ${{github.workspace}}/qt/; then
+            echo "Successfully installed Qt 6.5.3 for android_arm64_v8a"
+          elif python3 -m aqt install-qt linux android 6.5.3 android_armv7 \
+            --outputdir ${{github.workspace}}/qt/; then
+            echo "Successfully installed Qt 6.5.3 for android_armv7"
+          else
+            echo "ERROR: Failed to install Qt 6.5.3 for Android"
+            echo "Trying to list available versions and architectures..."
+            python3 -m aqt list-qt linux android || true
+            exit 1
+          fi
+          
+          # Verify Android Qt was actually installed
+          echo "Verifying Android Qt installation..."
+          if find ${{github.workspace}}/qt -path "*/android*/bin/qmake" -type f | grep -q .; then
+            echo "Android Qt qmake found - installation successful"
+          else
+            echo "ERROR: Android Qt installation failed - no Android qmake found"
+            echo "Directory structure:"
+            ls -la ${{github.workspace}}/qt/
+            exit 1
+          fi
+
+      - name: Install Qt Desktop (needed for qmake)
+        run: |
+          # Install Qt 6.5.3 for desktop to match Android version
+          echo "Installing Qt 6.5.3 for desktop..."
+          python3 -m aqt install-qt linux desktop 6.5.3 gcc_64 \
+            --outputdir ${{github.workspace}}/qt/
+
+      - name: Verify Android environment
+        run: |
+          echo "ANDROID_HOME: $ANDROID_HOME"
+          echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
+          echo "JAVA_HOME: $JAVA_HOME"
+          
+          # We're using Qt 6.5.3 for Android
+          echo "Looking for Qt 6.5.3 Android installation..."
+          
+          # Find Qt installations
+          echo "Qt directory structure:"
+          find ${{github.workspace}}/qt -name "6.5.3" -type d
+          
+          # Find Android qmake specifically (not desktop qmake)
+          # Android Qt is typically in paths containing "android"
+          ANDROID_QMAKE=$(find ${{github.workspace}}/qt -path "*/android*/bin/qmake" -type f | head -1)
+          
+          if [ -n "$ANDROID_QMAKE" ]; then
+            ANDROID_QT_DIR=$(dirname $(dirname "$ANDROID_QMAKE"))
+            echo "Android Qt installation found at: $ANDROID_QT_DIR"
+            echo "Android qmake found at: $ANDROID_QMAKE"
+            echo "ANDROID_QT_DIR=$ANDROID_QT_DIR" >> $GITHUB_ENV
+            echo "ANDROID_QMAKE=$ANDROID_QMAKE" >> $GITHUB_ENV
+            
+            # Verify qmake version
+            echo "Android qmake version:"
+            "$ANDROID_QMAKE" -version
+          else
+            echo "ERROR: Android qmake not found"
+            echo "Listing all qmake files:"
+            find ${{github.workspace}}/qt -name "qmake" -type f
+            exit 1
+          fi
+          
+          # Check if required tools exist
+          which make || echo "make not found"
+          ls -la $ANDROID_HOME/platforms/ || echo "No Android platforms found"
+          ls -la $ANDROID_NDK_HOME/ || echo "NDK not found"
+
+      - name: Configure project for Android
+        run: |
+          set -e  # Exit immediately if any command fails
+          
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
+          export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+          
+          # Use the Android qmake we found earlier
+          echo "Using Android qmake from: $ANDROID_QMAKE"
+          echo "Using Android Qt at: $ANDROID_QT_DIR"
+          
+          if [ -n "$ANDROID_QMAKE" ] && [ -f "$ANDROID_QMAKE" ]; then
+            export PATH="$(dirname $ANDROID_QMAKE):$PATH"
+            
+            # Generate Makefile for Android
+            echo "Configuring project with qmake..."
+            if ! "$ANDROID_QMAKE" -spec android-clang \
+                  CONFIG+=release \
+                  ANDROID_ABIS=arm64-v8a \
+                  Interrogator.pro; then
+              echo "ERROR: qmake configuration failed"
+              exit 1
+            fi
+          else
+            echo "ERROR: Android qmake not found at $ANDROID_QMAKE"
+            find ${{github.workspace}}/qt -name "qmake" -type f
+            exit 1
+          fi
+          
+      - name: Build APK
+        run: |
+          set -e  # Exit immediately if any command fails
+          
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
+          export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+          
+          # Use the Android qmake path
+          if [ -n "$ANDROID_QMAKE" ]; then
+            export PATH="$(dirname $ANDROID_QMAKE):$PATH"
+          fi
+          
+          # Build the Android project
+          echo "Building Android project with make..."
+          if ! make -j$(nproc); then
+            echo "ERROR: Make build failed"
+            exit 1
+          fi
+          
+          # Find androiddeployqt tool in the Android Qt directory
+          ANDROIDDEPLOYQT=$(find $ANDROID_QT_DIR -name "androiddeployqt" -type f | head -1)
+          
+          if [ -z "$ANDROIDDEPLOYQT" ]; then
+            # Try searching in the whole Qt directory
+            ANDROIDDEPLOYQT=$(find ${{github.workspace}}/qt -path "*/android*/bin/androiddeployqt" -type f | head -1)
+          fi
+          
+          echo "Looking for androiddeployqt..."
+          if [ -n "$ANDROIDDEPLOYQT" ] && [ -f "$ANDROIDDEPLOYQT" ]; then
+            echo "Found androiddeployqt at: $ANDROIDDEPLOYQT"
+            # Package APK using androiddeployqt
+            echo "Generating APK with androiddeployqt..."
+            if ! "$ANDROIDDEPLOYQT" \
+              --input android-Interrogator-deployment-settings.json \
+              --output android-build \
+              --android-platform android-${{ env.ANDROID_API_LEVEL }} \
+              --jdk $JAVA_HOME \
+              --gradle \
+              --release; then
+              echo "ERROR: androiddeployqt failed"
+              exit 1
+            fi
+          else
+            echo "ERROR: androiddeployqt not found"
+            echo "Cannot package APK without androiddeployqt"
+            exit 1
+          fi
+          
+          # List what was built
+          echo "Files generated:"
+          find . -name "*.apk" -o -name "*.aab" | head -10
+          
+      - name: Find and copy APK
+        run: |
+          set -e  # Exit immediately if any command fails
+          
+          # Look for generated APK files
+          echo "Searching for APK files..."
+          find . -name "*.apk" -type f
+          
+          # Copy APK to standard location
+          APK_FILE=$(find . -name "*.apk" -type f | head -1)
+          if [ -n "$APK_FILE" ]; then
+            cp "$APK_FILE" AndroidInterrogator.apk
+            echo "Found APK: $APK_FILE"
+            ls -la AndroidInterrogator.apk
+          else
+            echo "WARNING: No APK found, checking for AAB files..."
+            find . -name "*.aab" -type f
+            
+            # If AAB exists, we'd need bundletool to convert to APK
+            AAB_FILE=$(find . -name "*.aab" -type f | head -1)
+            if [ -n "$AAB_FILE" ]; then
+              echo "Found AAB: $AAB_FILE"
+              # For now, just copy the AAB as the output
+              cp "$AAB_FILE" AndroidInterrogator.aab
+            else
+              echo "ERROR: No APK or AAB files were generated"
+              echo "Build appears to have failed"
+              exit 1
+            fi
+          fi
+          
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: AndroidInterrogator-Build
           path: |
             AndroidInterrogator.apk
+            AndroidInterrogator.aab
+            android-build/build/outputs/**/*
+          if-no-files-found: warn
+
+      - name: Upload Build Logs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Android-Build-Logs
+          path: |
+            android-build/build/outputs/logs/
+            *.log
+          if-no-files-found: ignore
           

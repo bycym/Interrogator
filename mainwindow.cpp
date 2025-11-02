@@ -181,7 +181,7 @@ void MainWindow::on_actionAsk_wrongs_answers_only_triggered()
     {
         newWords();
     }
-    this->statusBar()->showMessage("there is " + QString(wp->getWrongWordsSize()) + " wrong word(s).");
+    this->statusBar()->showMessage("there is " + QString::number(wp->getWrongWordsSize()) + " wrong word(s).");
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -250,7 +250,7 @@ void MainWindow::on_actionExport_wrong_answers_append_triggered()
 void MainWindow::on_actionAk_wrong_answers_only_append_triggered()
 {
     bool ret = false;
-    this->statusBar()->showMessage("there is " + QString(wp->getWrongWordsSize()) + " wrong word(s).");
+    this->statusBar()->showMessage("there is " + QString::number(wp->getWrongWordsSize()) + " wrong word(s).");
     ret = wp->getWrongAnswersOnly(true);
     if(ret)
     {

@@ -54,3 +54,12 @@ compile_commands.json
 *_qmlcache.qrc
 
 Interrogator.app
+
+# Android build artifacts
+android-build/
+*.apk
+*.aab
+*-deployment-settings.json
+.gradle/
+build/
+local.properties

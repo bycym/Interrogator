@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  android-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.android
+    image: interrogator-android-builder:latest
+    container_name: interrogator-android-build
+    volumes:
+      # Mount the project directory
+      - .:/workspace
+      # Cache Qt installations (optional, to speed up rebuilds)
+      - qt-cache:/opt/qt
+      # Cache Android SDK (optional)
+      - android-sdk-cache:/opt/android-sdk
+    environment:
+      - ANDROID_SDK_ROOT=/opt/android-sdk
+      - QT_VERSION=6.5.3
+      - QT_ROOT=/opt/qt
+    working_dir: /workspace
+    command: /workspace/scripts/build-android-local.sh
+
+volumes:
+  qt-cache:
+  android-sdk-cache:

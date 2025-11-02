@@ -6,6 +6,8 @@
 #include <set>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include <algorithm>    /* std::shuffle */
+#include <random>       /* std::default_random_engine */
 
 wordProcessor::wordProcessor()
 {
@@ -157,7 +159,10 @@ void wordProcessor::init()
     _allWords = _words.size();
     _askedIndex = 0;
     std::srand(time(0));
-    std::random_shuffle(_words.begin(),_words.end());
+    // Use std::shuffle instead of std::random_shuffle (removed in C++17)
+    std::random_device rd;
+    std::default_random_engine rng(rd());
+    std::shuffle(_words.begin(), _words.end(), rng);
     _wrongWords.clear();
 }
 
@@ -225,7 +230,12 @@ bool wordProcessor::openFile(QString fileName)
     }
 
     QTextStream in(&file);
+    // Qt 6: Use setEncoding instead of setCodec
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    in.setEncoding(QStringConverter::Utf8);
+#else
     in.setCodec("UTF-8");
+#endif
     while(!in.atEnd()) {
         QString line = in.readLine();
         QStringList fields = line.split(_separate[EQUAL]);
